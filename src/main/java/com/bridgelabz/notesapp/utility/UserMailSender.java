@@ -24,7 +24,7 @@ public class UserMailSender implements IMailSender
             messageHelper.setTo(to);
             messageHelper.setSubject("Mail Form Admin");
             messageHelper.setText("<html><body>" +
-                    "<link>"+"http://localhost:8080/user/confirm-email?token="+token+"</link></body></html>",true);
+                    "<link>"+"http://localhost:8080/user/confirm-email/"+token+"</link></body></html>",true);
             javaMailSender.send(mimeMessage);
         }
         catch (Exception e)

@@ -33,6 +33,6 @@ public class Users
     private boolean isVerified = false;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "fk_note" , referencedColumnName = "USER_ID")
+    @JoinColumn(name = "fk_user_id" , referencedColumnName = "USER_ID")
     private List<Notes> notes;
 }

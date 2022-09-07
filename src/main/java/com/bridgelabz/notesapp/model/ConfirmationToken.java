@@ -20,7 +20,7 @@ public class ConfirmationToken
     private String token;
 
     @OneToOne(targetEntity = Users.class , cascade = CascadeType.ALL)
-    @JoinColumn(name = "fk_token_id")
+    @JoinColumn(name = "fk_user_id")
     private Users users;
 
     public ConfirmationToken(String token , Users users)

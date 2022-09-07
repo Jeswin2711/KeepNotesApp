@@ -2,9 +2,10 @@ package com.bridgelabz.notesapp.controller;
 
 import com.bridgelabz.notesapp.dto.ResetPasswordDto;
 import com.bridgelabz.notesapp.dto.UserLoginDto;
+import com.bridgelabz.notesapp.dto.UserRegisterDto;
+import com.bridgelabz.notesapp.exception.CustomException;
 import com.bridgelabz.notesapp.model.Notes;
-import com.bridgelabz.notesapp.model.Users;
-import com.bridgelabz.notesapp.service.UserService;
+import com.bridgelabz.notesapp.service.UserServiceImpl;
 import com.bridgelabz.notesapp.utility.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,60 +19,59 @@ import java.util.List;
 public class UserController
 {
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @PostMapping("/register")
-    public String registerUser(@RequestBody Users users)
+    public String registerUser(@RequestBody UserRegisterDto userRegisterDto)
     {
-        return userService.registerUser(users);
+        return userServiceImpl.registerUser(userRegisterDto);
     }
 
-    @GetMapping("/confirm-email")
-    public String confirmUser(@RequestParam("token")String confirmationToken)
+    @GetMapping("/confirm-email/{token}")
+    public String confirmUser(@PathVariable String token)
     {
-        return userService.confirmEmail(confirmationToken);
+        return userServiceImpl.confirmEmail(token);
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody UserLoginDto userloginDto) throws Exception {
-        return userService.login(userloginDto);
+    public String login(@RequestBody UserLoginDto userloginDto) throws CustomException {
+        return userServiceImpl.login(userloginDto);
     }
 
     @PostMapping("/reset-password/{id}")
     public String resetPassword(@RequestBody ResetPasswordDto resetPasswordDto ,
-                                @PathVariable int id) throws Exception {
-        return userService.resetPassword(id , resetPasswordDto);
+                                @PathVariable int id) throws CustomException {
+        return userServiceImpl.resetPassword(id , resetPasswordDto);
     }
 
     @PostMapping("/forgot-password/{id}")
-    public String forgotPassword(@PathVariable int id) throws Exception
+    public String forgotPassword(@PathVariable int id) throws CustomException
     {
-        return userService.forgotPassword(id);
-    }
-
-    @GetMapping("/getall")
-    public ResponseEntity<Response> getAllUser()
-    {
-        return new ResponseEntity<>(userService.getAllUser() , HttpStatus.OK);
+        return userServiceImpl.forgotPassword(id);
     }
 
     @PostMapping("/addnote/{id}")
-    public ResponseEntity<Response> addNoteById(int id , @PathVariable List<Notes> notes) throws Exception
+    public ResponseEntity<Response> addNoteById(@PathVariable int id , @RequestBody List<Notes> notes) throws CustomException
     {
-        return new ResponseEntity<>(userService.addNoteById( id, notes ),HttpStatus.OK);
+        return new ResponseEntity<>(userServiceImpl.addNoteById( id, notes ),HttpStatus.OK);
     }
 
     @GetMapping("/{user_id}/getnote/{note_id}")
-    public ResponseEntity<Response> getNoteById(int user_id , int note_id) throws Exception
+    public ResponseEntity<Response> getNoteById(@PathVariable int user_id , @PathVariable int note_id) throws CustomException
     {
-        return new ResponseEntity<>(userService.getNoteById(user_id , note_id ) , HttpStatus.OK);
+        return new ResponseEntity<>(userServiceImpl.getNoteById(user_id , note_id ) , HttpStatus.OK);
+    }
+
+    @GetMapping("/{user_id}/getnotes")
+    public ResponseEntity<Response> getNotesById(@PathVariable int user_id) throws CustomException
+    {
+        return new ResponseEntity<>(userServiceImpl.getNotesById(user_id) , HttpStatus.OK);
     }
 
     @DeleteMapping("/{user_id}/deletenote/{note_id}")
-    public ResponseEntity<Response> deleteNoteById(int user_id , int note_id) throws Exception
+    public ResponseEntity<Response> deleteNoteById(@PathVariable int user_id , @PathVariable int note_id) throws CustomException
     {
-        return new ResponseEntity<>(userService.deleteNoteById(user_id,note_id),HttpStatus.OK);
+        return new ResponseEntity<>(userServiceImpl.deleteNoteById(user_id,note_id),HttpStatus.OK);
     }
-
 }
 
