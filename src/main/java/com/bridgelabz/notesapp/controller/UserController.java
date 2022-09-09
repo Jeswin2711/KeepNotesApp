@@ -38,20 +38,20 @@ public class UserController
         return userServiceImpl.login(userloginDto);
     }
 
-    @PostMapping("/reset-password/{id}")
+    @PutMapping("/reset-password/{email}")
     public String resetPassword(@RequestBody ResetPasswordDto resetPasswordDto ,
-                                @PathVariable int id) throws CustomException {
-        return userServiceImpl.resetPassword(id , resetPasswordDto);
+                                @PathVariable String email) throws CustomException {
+        return userServiceImpl.resetPassword(email , resetPasswordDto);
     }
 
-    @PostMapping("/forgot-password/{id}")
-    public String forgotPassword(@PathVariable int id) throws CustomException
+    @PostMapping("/forgot-password/{email}")
+    public String forgotPassword(@PathVariable String email) throws CustomException
     {
-        return userServiceImpl.forgotPassword(id);
+        return userServiceImpl.forgotPassword(email);
     }
 
     @PostMapping("/addnote/{id}")
-    public ResponseEntity<Response> addNoteById(@PathVariable int id , @RequestBody List<Notes> notes) throws CustomException
+    public ResponseEntity<Response> addNoteById(@PathVariable int id , @RequestBody Notes notes) throws CustomException
     {
         return new ResponseEntity<>(userServiceImpl.addNoteById( id, notes ),HttpStatus.OK);
     }

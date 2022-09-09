@@ -24,6 +24,7 @@ public class SecurityFilters extends OncePerRequestFilter
 
     @Autowired
     private UserCredentials user;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

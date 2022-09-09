@@ -8,11 +8,9 @@ import com.bridgelabz.notesapp.exception.CustomException;
 import com.bridgelabz.notesapp.utility.security.JwtService;
 import com.bridgelabz.notesapp.service.interfaces.UserService;
 import com.bridgelabz.notesapp.utility.UserMailSender;
-import com.bridgelabz.notesapp.model.ConfirmationToken;
 import com.bridgelabz.notesapp.model.Notes;
-import com.bridgelabz.notesapp.model.Users;
+import com.bridgelabz.notesapp.model.User;
 import com.bridgelabz.notesapp.repository.NotesRepository;
-import com.bridgelabz.notesapp.repository.TokenRepository;
 import com.bridgelabz.notesapp.repository.UserRepository;
 import com.bridgelabz.notesapp.utility.Response;
 import org.modelmapper.ModelMapper;
@@ -22,7 +20,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Service
@@ -38,9 +39,6 @@ public class UserServiceImpl implements UserService
     private NotesRepository notesRepository;
 
     @Autowired
-    private TokenRepository tokenRepository;
-
-    @Autowired
     private ModelMapper mapper;
 
     @Autowired
@@ -50,6 +48,9 @@ public class UserServiceImpl implements UserService
     private AuthenticationManager authenticationManager;
 
     @Autowired
+    private HttpServletRequest httpServlet;
+
+    @Autowired
     private JwtService jwtService;
 
     @Value("${fromEmail}")
@@ -57,7 +58,7 @@ public class UserServiceImpl implements UserService
 
     public String registerUser(UserRegisterDto userRegisterDto)
     {
-        Users user = mapper.map(userRegisterDto , Users.class);
+        User user = mapper.map(userRegisterDto , User.class);
         userRepository.findByUserName(userRegisterDto.getUserName()).ifPresent(
                 action -> {
                     try {
@@ -92,10 +93,8 @@ public class UserServiceImpl implements UserService
 
         String jwtToken = jwtService.generateToken(userDetails);
 
-
-        tokenRepository.save(new ConfirmationToken(jwtToken,user));
         userRepository.save(user);
-        mailSender.confirmEmail(fromEmail,user.getEmail(),tokenRepository.getById(user.getId()).getToken());
+        mailSender.confirmEmail(fromEmail,user.getEmail(),jwtToken);
         return "User Registered Successfully";
     }
 
@@ -105,6 +104,10 @@ public class UserServiceImpl implements UserService
             if(userRepository.findByUserName(userLoginDto.getUserName()).isPresent() &&
             userRepository.findByUserName(userLoginDto.getUserName()).get().getPassWord().equals(userLoginDto.getPassWord()))
             {
+                UserDetails loginDetails = userCredentials.loadUserByUsername(userLoginDto.getUserName());
+                String token = jwtService.generateToken(loginDetails);
+                mailSender.loginEmail(fromEmail,userRepository.findByUserName(userLoginDto.getUserName()).get().getEmail(),
+                        token);
                 return "Login Successfull";
             }
             else
@@ -119,20 +122,21 @@ public class UserServiceImpl implements UserService
     }
 
 
-    public String resetPassword(int id , ResetPasswordDto resetPasswordDto) throws CustomException {
-        if(userRepository.findById(id).isPresent())
+    public String resetPassword(String email , ResetPasswordDto resetPasswordDto) throws CustomException {
+        String authorizationHeader = httpServlet.getHeader("Authorization");
+        String jwt = authorizationHeader.substring(7);
+        String userName = jwtService.extractUsername(jwt);
+        if(userRepository.findByEmail(email).get().getUserName().equals(userName))
         {
-            if(userRepository.findById(id).get()
-                    .getPassWord().equals(
-                            resetPasswordDto.getOldPassword()
-                    ))
+            if(resetPasswordDto.getNewPassword().equals(resetPasswordDto.getConfirmPassword()))
             {
-                userRepository.findById(id).get().setPassWord(resetPasswordDto.getNewPassword());
-                mailSender.sendEmail(fromEmail,userRepository.findById(id).get().getEmail());
+                userRepository.findByEmail(email).get().setPassWord(resetPasswordDto.getNewPassword());
+                userRepository.save(userRepository.findByEmail(email).get());
+                mailSender.sendEmail(fromEmail,email);
             }
             else
             {
-                throw new CustomException("Old password invalid");
+                throw new CustomException("Password Not Matching");
             }
         }
         else
@@ -143,10 +147,10 @@ public class UserServiceImpl implements UserService
     }
 
 
-    public String forgotPassword (int id) throws CustomException {
-        String toEmail = userRepository.findById(id).get().getEmail();
+    public String forgotPassword (String email) throws CustomException {
+        String toEmail = userRepository.findByEmail(email).get().getEmail();
 
-        if(userRepository.findById(id).isPresent())
+        if(userRepository.findByEmail(email).isPresent())
         {
             mailSender.sendEmail(
                     fromEmail , toEmail
@@ -159,18 +163,18 @@ public class UserServiceImpl implements UserService
         return "Mail Sent Successfully";
     }
 
-    public Response addNoteById(int id , List<Notes> notes) throws CustomException {
-        if(userRepository.findById(id).isPresent())
-        {
-           userRepository.findById(id).get().setNotes(notes);
-           notes.addAll(notes);
-           notesRepository.saveAll(notes);
+    public Response addNoteById(int id , Notes notes) throws CustomException {
+        String authorizationHeader = httpServlet.getHeader("Authorization");
+        String jwt = authorizationHeader.substring(7);
+        String userName = jwtService.extractUsername(jwt);
+        if(userRepository.findById(id).get().getUserName().equals(userName)) {
+            userRepository.findById(id).get().getNotes().add(notes);
+            notesRepository.save(notes);
         }
         else
         {
-            throw new CustomException("User ID not found");
+            throw new CustomException("ID and Token Not Matching");
         }
-
         return new Response("Note Added Successfully",HttpStatus.OK);
     }
 
@@ -239,8 +243,9 @@ public class UserServiceImpl implements UserService
 
     public String confirmEmail(String confirmationToken)
     {
-        userRepository.getById(tokenRepository.findByToken(confirmationToken).get().getId()).setVerified(true);
-        userRepository.save(userRepository.getById(tokenRepository.findByToken(confirmationToken).get().getId()));
+        String username = jwtService.extractUsername(confirmationToken);
+        userRepository.findByUserName(username).get().setVerified(true);
+        userRepository.save(userRepository.findByUserName(username).get());
         return "Verified Successfully";
     }
 }

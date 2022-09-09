@@ -13,9 +13,9 @@ public interface UserService
 {
     String registerUser(UserRegisterDto userRegisterDto);
     String login(UserLoginDto userLoginDto) throws CustomException;
-    String resetPassword(int id , ResetPasswordDto resetPasswordDto) throws CustomException;
-     String forgotPassword (int id) throws CustomException;
-     Response addNoteById(int id , List<Notes> notes) throws CustomException;
+    String resetPassword(String email , ResetPasswordDto resetPasswordDto) throws CustomException;
+     String forgotPassword (String email) throws CustomException;
+     Response addNoteById(int id , Notes notes) throws CustomException;
     Response getNoteById(int user_id ,int note_id) throws CustomException;
     Response deleteNoteById(int user_id , int note_id ) throws CustomException;
     String confirmEmail(String confirmationToken);

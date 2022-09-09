@@ -1,16 +1,14 @@
 package com.bridgelabz.notesapp.model;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Data
 @Entity
-@Table(name = "Users")
-public class Users
+@Table(name = "User")
+public class User
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

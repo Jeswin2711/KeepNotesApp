@@ -39,6 +39,24 @@ public class UserMailSender implements IMailSender
         return "<html><head>Hi User,</head><body>Password Request Successfull for Email"+email+"</body></html>";
     }
 
+
+    public void loginEmail(String from , String to , String token)
+    {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
+            messageHelper.setFrom(from);
+            messageHelper.setTo(to);
+            messageHelper.setSubject("Mail Form Admin");
+            messageHelper.setText("<html><body>You are Successfully Login with token : "+ token +"</body></html>",true);
+            javaMailSender.send(mimeMessage);
+        }
+        catch (Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+
     @Override
     public void sendEmail(String from, String to)
     {
