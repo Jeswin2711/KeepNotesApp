@@ -1,5 +1,6 @@
 package com.bridgelabz.notesapp.service;
 
+import com.bridgelabz.notesapp.dto.NotesDto;
 import com.bridgelabz.notesapp.utility.security.UserCredentials;
 import com.bridgelabz.notesapp.dto.ResetPasswordDto;
 import com.bridgelabz.notesapp.dto.UserLoginDto;
@@ -13,14 +14,15 @@ import com.bridgelabz.notesapp.model.User;
 import com.bridgelabz.notesapp.repository.NotesRepository;
 import com.bridgelabz.notesapp.repository.UserRepository;
 import com.bridgelabz.notesapp.utility.Response;
+import org.hibernate.loader.custom.sql.SQLQueryParser;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.object.SqlQuery;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -163,7 +165,8 @@ public class UserServiceImpl implements UserService
         return "Mail Sent Successfully";
     }
 
-    public Response addNoteById(int id , Notes notes) throws CustomException {
+    public Response addNoteById(int id , NotesDto notesDto) throws CustomException {
+        Notes notes = mapper.map(notesDto , Notes.class);
         String authorizationHeader = httpServlet.getHeader("Authorization");
         String jwt = authorizationHeader.substring(7);
         String userName = jwtService.extractUsername(jwt);
@@ -217,7 +220,7 @@ public class UserServiceImpl implements UserService
         {
             throw new CustomException("Invalid User Id");
         }
-        return new Response("User Id : "+ user_id , userNotes);
+        return new Response("User Id : "+ user_id , notesRepository.findUnArchived());
     }
 
 
@@ -248,4 +251,30 @@ public class UserServiceImpl implements UserService
         userRepository.save(userRepository.findByUserName(username).get());
         return "Verified Successfully";
     }
+
+
+    public String archieveNote(String username , int note_id)
+    {
+        String authorizationHeader = httpServlet.getHeader("Authorization");
+        String jwt = authorizationHeader.substring(7);
+        String userName = jwtService.extractUsername(jwt);
+        if(userRepository.findByUserName(username).get().getUserName().equals(userName)) {
+            notesRepository.deleteById(note_id);
+        }
+        return "Done";
+    }
+
+    public String unArchieve(String username , int note_id)
+    {
+        String authorizationHeader = httpServlet.getHeader("Authorization");
+        String jwt = authorizationHeader.substring(7);
+        String userName = jwtService.extractUsername(jwt);
+        if(userRepository.findByUserName(username).get().getUserName().equals(userName)) {
+            notesRepository.findById(note_id).get().setDeleted(false);
+            notesRepository.save(notesRepository.findById(note_id).get());
+            System.out.println("1212121");
+        }
+        return "";
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.bridgelabz.notesapp.controller;
 
+import com.bridgelabz.notesapp.dto.NotesDto;
 import com.bridgelabz.notesapp.dto.ResetPasswordDto;
 import com.bridgelabz.notesapp.dto.UserLoginDto;
 import com.bridgelabz.notesapp.dto.UserRegisterDto;
@@ -51,7 +52,7 @@ public class UserController
     }
 
     @PostMapping("/addnote/{id}")
-    public ResponseEntity<Response> addNoteById(@PathVariable int id , @RequestBody Notes notes) throws CustomException
+    public ResponseEntity<Response> addNoteById(@PathVariable int id , @RequestBody NotesDto notes) throws CustomException
     {
         return new ResponseEntity<>(userServiceImpl.addNoteById( id, notes ),HttpStatus.OK);
     }
@@ -72,6 +73,20 @@ public class UserController
     public ResponseEntity<Response> deleteNoteById(@PathVariable int user_id , @PathVariable int note_id) throws CustomException
     {
         return new ResponseEntity<>(userServiceImpl.deleteNoteById(user_id,note_id),HttpStatus.OK);
+    }
+
+
+
+    @PostMapping("/archieve/{username}/{note_id}")
+    public void archieveNote(@PathVariable String username , @PathVariable int note_id)
+    {
+        System.out.println(userServiceImpl.archieveNote(username , note_id));
+    }
+
+    @PostMapping("/unarchieve/{username}/{note_id}")
+    public void unArchieve(@PathVariable String username , @PathVariable int note_id)
+    {
+        System.out.println(userServiceImpl.unArchieve(username , note_id));
     }
 }
 
