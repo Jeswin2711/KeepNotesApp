@@ -1,10 +1,7 @@
 package com.bridgelabz.notesapp.model;
 
 import lombok.Data;
-import org.springframework.web.bind.annotation.GetMapping;
-
 import javax.persistence.*;
-import java.util.List;
 
 
 @Data

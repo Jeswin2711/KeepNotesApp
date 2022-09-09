@@ -1,16 +1,14 @@
 package com.bridgelabz.notesapp.model;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Data
 @Entity
-@Table(name = "Users")
-public class Users
+@Table(name = "User")
+public class User
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +31,6 @@ public class Users
     private boolean isVerified = false;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "fk_note" , referencedColumnName = "USER_ID")
+    @JoinColumn(name = "fk_user_id" , referencedColumnName = "USER_ID")
     private List<Notes> notes;
 }
