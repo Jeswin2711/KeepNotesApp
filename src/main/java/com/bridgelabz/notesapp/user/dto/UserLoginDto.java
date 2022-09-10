@@ -1,4 +1,4 @@
-package com.bridgelabz.notesapp.dto;
+package com.bridgelabz.notesapp.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

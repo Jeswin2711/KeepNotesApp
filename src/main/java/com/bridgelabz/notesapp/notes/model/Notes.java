@@ -1,4 +1,4 @@
-package com.bridgelabz.notesapp.model;
+package com.bridgelabz.notesapp.notes.model;
 
 import lombok.Data;
 import org.hibernate.annotations.*;
@@ -25,6 +25,6 @@ public class Notes
     @Column(name = "Note")
     private String note;
 
-    @Column(name = "deleted")
-    private boolean deleted = Boolean.FALSE;
+    @Column(name = "isArchieved")
+    private boolean isArchieved = Boolean.FALSE;
 }
