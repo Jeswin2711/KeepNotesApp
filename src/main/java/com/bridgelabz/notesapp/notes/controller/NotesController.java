@@ -36,22 +36,22 @@ public class NotesController
         return new ResponseEntity<>(notesService.getNotesById(user_id) , HttpStatus.OK);
     }
 
-    @DeleteMapping("/{user_id}/deletenote/{note_id}")
+    @DeleteMapping("/{user_id}/delete/{note_id}")
     public ResponseEntity<Response> deleteNoteById(@PathVariable int user_id , @PathVariable int note_id) throws CustomException
     {
         return new ResponseEntity<>(notesService.deleteNoteById(user_id,note_id),HttpStatus.OK);
     }
 
+    @PostMapping("/{user_id}/restore/{note_id}")
+    public ResponseEntity<Response> undoDeletedNoteById(@PathVariable int user_id , @PathVariable int note_id) throws CustomException
+    {
+        return new ResponseEntity<>(notesService.restoreNote(user_id,note_id),HttpStatus.OK);
+    }
 
     @PostMapping("/archieve/{username}/{note_id}")
     public ResponseEntity<Response> archieveNote(@PathVariable String username , @PathVariable int note_id)
     {
-        return new ResponseEntity<>(notesService.archieveNote(username , note_id),HttpStatus.OK);
+        return new ResponseEntity<>(notesService.archivedNote(username , note_id),HttpStatus.OK);
     }
 
-    @PostMapping("/unarchieve/{username}/{note_id}")
-    public ResponseEntity<Response> unArchieve(@PathVariable String username , @PathVariable int note_id)
-    {
-        return new ResponseEntity<>(notesService.unArchieveNote(username , note_id),HttpStatus.OK);
-    }
 }

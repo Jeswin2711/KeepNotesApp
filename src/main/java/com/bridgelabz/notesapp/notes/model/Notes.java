@@ -1,8 +1,6 @@
 package com.bridgelabz.notesapp.notes.model;
 
 import lombok.Data;
-import org.hibernate.annotations.*;
-
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -11,9 +9,6 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Table(name = "Notes")
-@SQLDelete(sql = "UPDATE notes SET deleted = true WHERE id=?")
-@FilterDef(name = "deletedProductFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
-@Filter(name = "deletedProductFilter", condition = "deleted = :isDeleted")
 public class Notes
 {
 
@@ -22,9 +17,18 @@ public class Notes
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "Note")
-    private String note;
+    @Column(name = "Title")
+    private String title;
 
-    @Column(name = "isArchieved")
-    private boolean isArchieved = Boolean.FALSE;
+    @Column(name = "Description")
+    private String description;
+
+    @Column(name = "is_archived")
+    private boolean isArchived = Boolean.FALSE;
+
+    @Column(name = "isDeleted")
+    private boolean isDeleted = Boolean.FALSE;
+
+    @Column(name = "Color")
+    private String color;
 }

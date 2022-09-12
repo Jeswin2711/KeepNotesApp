@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface NotesRepository extends JpaRepository<Notes,Integer>
 {
-    @Query("SELECT u FROM Notes u where u.isArchieved = false ")
+    @Query("SELECT u FROM Notes u where u.isArchived = false and u.isDeleted = false")
     List<Notes> findUnArchived();
 }

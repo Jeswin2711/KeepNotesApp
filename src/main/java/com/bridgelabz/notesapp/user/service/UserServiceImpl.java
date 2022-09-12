@@ -8,7 +8,6 @@ import com.bridgelabz.notesapp.exception.CustomException;
 import com.bridgelabz.notesapp.utility.security.JwtService;
 import com.bridgelabz.notesapp.utility.UserMailSender;
 import com.bridgelabz.notesapp.user.model.User;
-import com.bridgelabz.notesapp.notes.repository.NotesRepository;
 import com.bridgelabz.notesapp.user.repository.UserRepository;
 import com.bridgelabz.notesapp.utility.Response;
 import org.modelmapper.ModelMapper;
@@ -113,7 +112,6 @@ public class UserServiceImpl implements IUserService
             throw new CustomException("Please Verify you Email");
         }
     }
-
 
     public Response resetPassword(String email , ResetPasswordDto resetPasswordDto) throws CustomException {
         String authorizationHeader = httpServlet.getHeader("Authorization");

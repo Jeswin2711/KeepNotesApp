@@ -33,12 +33,18 @@ public class INotesServiceImpl implements INotesService
     @Autowired
     private JwtService jwtService;
 
-
-    public Response addNoteById(int id , NotesDto notesDto) throws CustomException {
-        Notes notes = mapper.map(notesDto , Notes.class);
+    public String tokenCheck()
+    {
         String authorizationHeader = httpServlet.getHeader("Authorization");
         String jwt = authorizationHeader.substring(7);
         String userName = jwtService.extractUsername(jwt);
+        return userName;
+    }
+
+
+    public Response addNoteById(int id , NotesDto notesDto) throws CustomException {
+        Notes notes = mapper.map(notesDto , Notes.class);
+        String userName = tokenCheck();
         if(userRepository.findById(id).get().getUserName().equals(userName)) {
             userRepository.findById(id).get().getNotes().add(notes);
             notesRepository.save(notes);
@@ -100,9 +106,28 @@ public class INotesServiceImpl implements INotesService
             List<Notes> userNotes = userRepository.findById(user_id).get().getNotes();
             for(Notes note : userNotes)
             {
-                if (note.getId() == note_id)
+                if(notesRepository.findById(note_id).isPresent())
                 {
-                    notesRepository.deleteById(note_id);
+                    if (note.getId() == note_id)
+                    {
+                        if(notesRepository.findById(note_id).get().isDeleted() == false)
+                        {
+                            notesRepository.findById(note_id).get().setDeleted(true);
+                            notesRepository.save(notesRepository.findById(note_id).get());
+                        }
+                        else if(notesRepository.findById(note_id).get().isDeleted() == true)
+                        {
+                            notesRepository.deleteById(note_id);
+                        }
+                        else
+                        {
+                            throw new CustomException("No data Found for this Id");
+                        }
+                    }
+                }
+                else
+                {
+                    throw new CustomException("Note Id not found...");
                 }
             }
         }
@@ -113,28 +138,51 @@ public class INotesServiceImpl implements INotesService
         return new Response("Deleted Successfully Note ID : "+ note_id , HttpStatus.OK);
     }
 
-
-    public Response archieveNote(String username , int note_id)
+    public Response restoreNote(int user_id , int note_id)
     {
-        String authorizationHeader = httpServlet.getHeader("Authorization");
-        String jwt = authorizationHeader.substring(7);
-        String userName = jwtService.extractUsername(jwt);
-        if(userRepository.findByUserName(username).get().getUserName().equals(userName)) {
-            notesRepository.deleteById(note_id);
+        if(userRepository.findById(user_id).isPresent())
+        {
+            if(notesRepository.findById(note_id).get().isDeleted() == true)
+            {
+                List<Notes> userNotes = userRepository.findById(user_id).get().getNotes();
+                for(Notes note : userNotes)
+                {
+                    if (note.getId() == note_id)
+                    {
+                        notesRepository.findById(note_id).get().setDeleted(false);
+                        notesRepository.save(notesRepository.findById(note_id).get());
+                    }
+                }
+            }
+            else
+            {
+                throw new CustomException("Id is Not Deleted");
+            }
         }
-        return new Response("Note Archieved Successfully",HttpStatus.OK);
+        else
+        {
+            throw new CustomException("Invalid User Id");
+        }
+        return new Response("Undo Successfull : "+ note_id , HttpStatus.OK);
     }
 
-    public Response unArchieveNote(String username , int note_id)
-    {
-        String authorizationHeader = httpServlet.getHeader("Authorization");
-        String jwt = authorizationHeader.substring(7);
-        String userName = jwtService.extractUsername(jwt);
-        if(userRepository.findByUserName(username).get().getUserName().equals(userName)) {
-            notesRepository.findById(note_id).get().setArchieved(false);
-            notesRepository.save(notesRepository.findById(note_id).get());
-        }
-        return new Response("Notes Un-Archieved Successfully",HttpStatus.OK);
-    }
 
+    public Response archivedNote(String username , int note_id) {
+        String userName = tokenCheck();
+
+        if (userRepository.findByUserName(userName).get().getUserName().equals(userName)) {
+            if (notesRepository.findById(note_id).get().isArchived() == false) {
+                notesRepository.findById(note_id).get().setArchived(false);
+                notesRepository.save(notesRepository.findById(note_id).get());
+            } else {
+                notesRepository.findById(note_id).get().setArchived(false);
+                notesRepository.save(notesRepository.findById(note_id).get());
+            }
+
+            return new Response("Archive Request Successfull", HttpStatus.OK);
+        } else {
+            throw new CustomException("Username Not Found");
+        }
+
+    }
 }

@@ -9,6 +9,6 @@ public interface INotesService
      Response addNoteById(int id , NotesDto notes) throws CustomException;
     Response getNoteById(int user_id ,int note_id) throws CustomException;
     Response deleteNoteById(int user_id , int note_id ) throws CustomException;
-    Response archieveNote(String username , int note_id);
-    Response unArchieveNote(String username , int note_id);
+    Response archivedNote(String username , int note_id);
+    Response restoreNote(int user_id , int note_id);
 }
