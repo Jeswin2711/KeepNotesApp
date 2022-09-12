@@ -185,4 +185,28 @@ public class INotesServiceImpl implements INotesService
         }
 
     }
+
+    public Response updateNote(String username, int note_id, NotesDto notesDto)
+    {
+        String userName = tokenCheck();
+        if(username.equals(userName))
+        {
+            Notes notes = notesRepository.getById(note_id);
+            if(notes != null)
+            {
+                notes.setTitle(notesDto.getTitle());
+                notes.setDescription(notesDto.getDescription());
+                notes.setColor(notesDto.getColor());
+                notesRepository.save(notes);
+            }
+            else
+            {
+                throw new CustomException("Note Not found");
+            }
+        }
+        else
+            throw new CustomException("You are Not Authorized");
+
+        return new Response("Note Updated Successfully",HttpStatus.OK);
+    }
 }

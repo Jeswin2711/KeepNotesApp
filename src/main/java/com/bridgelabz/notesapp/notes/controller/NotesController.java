@@ -2,6 +2,7 @@ package com.bridgelabz.notesapp.notes.controller;
 
 import com.bridgelabz.notesapp.exception.CustomException;
 import com.bridgelabz.notesapp.notes.dto.NotesDto;
+import com.bridgelabz.notesapp.notes.model.Notes;
 import com.bridgelabz.notesapp.notes.service.INotesServiceImpl;
 import com.bridgelabz.notesapp.utility.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,14 @@ public class NotesController
     public ResponseEntity<Response> archieveNote(@PathVariable String username , @PathVariable int note_id)
     {
         return new ResponseEntity<>(notesService.archivedNote(username , note_id),HttpStatus.OK);
+    }
+
+    @PutMapping("{username}/update/{note_id}")
+    public ResponseEntity<Response> updateNote(@PathVariable String username ,
+                                               @PathVariable int note_id,
+                                               @RequestBody NotesDto notesDto)
+    {
+        return new ResponseEntity<>(notesService.updateNote(username,note_id,notesDto),HttpStatus.OK);
     }
 
 }

@@ -11,4 +11,7 @@ public interface INotesService
     Response deleteNoteById(int user_id , int note_id ) throws CustomException;
     Response archivedNote(String username , int note_id);
     Response restoreNote(int user_id , int note_id);
+    Response updateNote(String username, int note_id, NotesDto notesDto);
+
+
 }
