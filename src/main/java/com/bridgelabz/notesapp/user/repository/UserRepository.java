@@ -1,7 +1,7 @@
-package com.bridgelabz.notesapp.repository;
+package com.bridgelabz.notesapp.user.repository;
 
 
-import com.bridgelabz.notesapp.model.User;
+import com.bridgelabz.notesapp.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

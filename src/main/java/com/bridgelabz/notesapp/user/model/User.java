@@ -1,5 +1,6 @@
-package com.bridgelabz.notesapp.model;
+package com.bridgelabz.notesapp.user.model;
 
+import com.bridgelabz.notesapp.notes.model.Notes;
 import lombok.Data;
 
 import javax.persistence.*;

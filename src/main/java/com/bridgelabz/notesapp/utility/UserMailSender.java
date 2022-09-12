@@ -23,8 +23,8 @@ public class UserMailSender implements IMailSender
             messageHelper.setFrom(from);
             messageHelper.setTo(to);
             messageHelper.setSubject("Mail Form Admin");
-            messageHelper.setText("<html><body>" +
-                    "<link>"+"http://localhost:8080/user/confirm-email/"+token+"</link></body></html>",true);
+            messageHelper.setText("<html><body>" + " <p>To Verify Email Click " +
+                    "<a href = http://localhost:8080/user/confirm-email/"+token+">here</a></p></body></html>",true);
             javaMailSender.send(mimeMessage);
         }
         catch (Exception e)
@@ -40,8 +40,7 @@ public class UserMailSender implements IMailSender
     }
 
 
-    public void loginEmail(String from , String to , String token)
-    {
+    public void loginEmail(String from , String to , String token) throws Exception {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
@@ -53,7 +52,24 @@ public class UserMailSender implements IMailSender
         }
         catch (Exception e)
         {
-            System.out.println(e);
+            throw new Exception("Error when Logging in");
+        }
+    }
+
+
+    public void forgotEmail(String fromEmail , String toEmail , String password) throws Exception {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
+            messageHelper.setFrom(fromEmail);
+            messageHelper.setTo(toEmail);
+            messageHelper.setSubject("Mail Form Admin");
+            messageHelper.setText("<html><body>Password Reset Successfully. User Account password"+password +"If you want to Change this password Kindly reset Password</body></html>",true);
+            javaMailSender.send(mimeMessage);
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Error when Restting password");
         }
     }
 
