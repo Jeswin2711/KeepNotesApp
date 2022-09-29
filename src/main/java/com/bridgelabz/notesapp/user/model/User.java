@@ -9,8 +9,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "User")
-public class User
-{
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "USER_ID")
@@ -32,6 +31,6 @@ public class User
     private boolean isVerified = false;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "fk_user_id" , referencedColumnName = "USER_ID")
+    @JoinColumn(name = "fk_user_id", referencedColumnName = "USER_ID")
     private List<Notes> notes;
 }

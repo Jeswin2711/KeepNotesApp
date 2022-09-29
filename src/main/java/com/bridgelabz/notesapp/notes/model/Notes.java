@@ -5,12 +5,10 @@ import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-
 @Data
 @Entity
 @Table(name = "Notes")
-public class Notes
-{
+public class Notes {
 
     @Id
     @Column(name = "ID")
@@ -23,12 +21,15 @@ public class Notes
     @Column(name = "Description")
     private String description;
 
-    @Column(name = "is_archived")
+    @Column(name = "isArchived")
     private boolean isArchived = Boolean.FALSE;
 
     @Column(name = "isDeleted")
     private boolean isDeleted = Boolean.FALSE;
 
+    @Column(name = "isPinned")
+    private boolean isPinned = Boolean.FALSE;
+
     @Column(name = "Color")
-    private String color;
+    private String color = "white";
 }

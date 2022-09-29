@@ -9,21 +9,19 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 
-
 @Service
 @Data
-public class UserCredentials implements UserDetailsService
-{
+public class UserCredentials implements UserDetailsService {
     private String userName;
     private String passWord;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if(username.equals(userName))
-        {
-            return new User(username,passWord,new ArrayList<>());
-        }
-        else
-        {
+        System.out.println("Username" + username);
+        System.out.println("UUUUsername" + userName);
+        if (username.equals(userName)) {
+            return new User(username, passWord, new ArrayList<>());
+        } else {
             throw new CustomException("Invalid Credentials");
         }
     }

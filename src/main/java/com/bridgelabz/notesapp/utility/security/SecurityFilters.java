@@ -16,8 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class SecurityFilters extends OncePerRequestFilter
-{
+public class SecurityFilters extends OncePerRequestFilter {
 
     @Autowired
     private JwtService jwtService;
@@ -27,27 +26,22 @@ public class SecurityFilters extends OncePerRequestFilter
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException
-    {
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
         String authorizationHeader = request.getHeader("Authorization");
-        String jwt = null ;
+        String jwt = null;
         String username = null;
-
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
             username = jwtService.extractUsername(jwt);
-            if(request.getQueryString()!=null)
-            {
+            if (request.getQueryString() != null) {
                 final String params = request.getQueryString();
-                String loginName = params.substring(9,params.indexOf("&"));
-                if(!loginName.equals(username))
-                {
+                String loginName = params.substring(9, params.indexOf("&"));
+                if (!loginName.equals(username)) {
                     throw new CustomException("Token is Invalid for this Username");
                 }
             }
         }
-
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             user.setUserName(username);
             UserDetails userDetails = user.loadUserByUsername(username);
@@ -59,7 +53,7 @@ public class SecurityFilters extends OncePerRequestFilter
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
         }
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
 
     }
 }

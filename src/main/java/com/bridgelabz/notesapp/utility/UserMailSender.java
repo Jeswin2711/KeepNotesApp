@@ -8,15 +8,12 @@ import org.springframework.stereotype.Service;
 import javax.mail.internet.MimeMessage;
 
 @Service
-public class UserMailSender implements IMailSender
-{
+public class UserMailSender implements IMailSender {
 
     @Autowired
     private JavaMailSender javaMailSender;
 
-
-    public String confirmEmail(String from , String to , String token)
-    {
+    public String confirmEmail(String from, String to, String token) {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
@@ -24,71 +21,79 @@ public class UserMailSender implements IMailSender
             messageHelper.setTo(to);
             messageHelper.setSubject("Mail Form Admin");
             messageHelper.setText("<html><body>" + " <p>To Verify Email Click " +
-                    "<a href = http://localhost:8080/user/confirm-email/"+token+">here</a></p></body></html>",true);
+                    "<a href = http://localhost:8080/user/confirm-email/" + token + ">here</a></p></body></html>",
+                    true);
             javaMailSender.send(mimeMessage);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.out.println(e);
         }
         return "Kindly Verify Email";
     }
 
-    private String messageBuilder(String email)
-    {
-        return "<html><head>Hi User,</head><body>Password Request Successfull for Email"+email+"</body></html>";
+    private String messageBuilder(String email) {
+        return "<html><head>Hi User,</head><body>Password Request Successfull for Email" + email + "</body></html>";
     }
 
-
-    public void loginEmail(String from , String to , String token) throws Exception {
+    public void loginEmail(String from, String to, String token) throws Exception {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
             messageHelper.setFrom(from);
             messageHelper.setTo(to);
             messageHelper.setSubject("Mail Form Admin");
-            messageHelper.setText("<html><body>You are Successfully Login with token : "+ token +"</body></html>",true);
+            messageHelper.setText("<html><body>You are Successfully Login with token : " + token + "</body></html>",
+                    true);
             javaMailSender.send(mimeMessage);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new Exception("Error when Logging in");
         }
     }
 
-
-    public void forgotEmail(String fromEmail , String toEmail , String password) throws Exception {
+    public void forgotEmail(String fromEmail, String toEmail, String password) throws Exception {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
             messageHelper.setFrom(fromEmail);
             messageHelper.setTo(toEmail);
             messageHelper.setSubject("Mail Form Admin");
-            messageHelper.setText("<html><body>Password Reset Successfully. User Account password"+password +"If you want to Change this password Kindly reset Password</body></html>",true);
+            messageHelper.setText("<html><body>Password Reset Successfully. User Account password" + password
+                    + "If you want to Change this password Kindly reset Password</body></html>", true);
             javaMailSender.send(mimeMessage);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new Exception("Error when Restting password");
         }
     }
 
     @Override
-    public void sendEmail(String from, String to)
-    {
+    public void sendEmail(String from, String to) {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
             messageHelper.setFrom(from);
             messageHelper.setTo(to);
             messageHelper.setSubject("Mail Form Admin");
-            messageHelper.setText(messageBuilder(to),true);
+            messageHelper.setText(messageBuilder(to), true);
             javaMailSender.send(mimeMessage);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.out.println(e);
         }
+    }
 
+    public void sendOtp(String to, String otp) {
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
+            messageHelper.setFrom("admin@jeswin.com");
+            messageHelper.setTo(to);
+            messageHelper.setSubject("Mail Form Admin");
+            messageHelper.setText(otpBuilder(to, otp), true);
+            javaMailSender.send(mimeMessage);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public String otpBuilder(String to, String otp) {
+        return "<html><head>Hi User,</head><body>Your Requester Otp " + otp + "</body></html>";
     }
 }

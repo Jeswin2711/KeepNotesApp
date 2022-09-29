@@ -3,9 +3,8 @@ package com.bridgelabz.notesapp.user.dto;
 import lombok.Data;
 
 @Data
-public class ResetPasswordDto
-{
-    private String newPassword;
+public class ResetPasswordDto {
 
-    private String confirmPassword;
+    private String passWord;
+
 }
