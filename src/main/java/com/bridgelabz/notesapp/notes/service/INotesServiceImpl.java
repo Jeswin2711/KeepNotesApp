@@ -43,13 +43,13 @@ public class INotesServiceImpl implements INotesService {
 
     public Response addNoteById(int id, NotesDto notesDto) throws CustomException {
         Notes notes = mapper.map(notesDto, Notes.class);
-        // String userName = tokenCheck();
-        // if (userRepository.findById(id).get().getUserName().equals(userName)) {
-        userRepository.findById(id).get().getNotes().add(notes);
-        notesRepository.save(notes);
-        // } else {
-        // throw new CustomException("ID and Token Not Matching");
-        // }
+        String userName = tokenCheck();
+        if (userRepository.findById(id).get().getUserName().equals(userName)) {
+            userRepository.findById(id).get().getNotes().add(notes);
+            notesRepository.save(notes);
+        } else {
+            throw new CustomException("ID and Token Not Matching");
+        }
         return new Response("Note Added Successfully", HttpStatus.OK);
     }
 
@@ -77,7 +77,10 @@ public class INotesServiceImpl implements INotesService {
     public Response getNotesById(int user_id) throws CustomException {
         List<Notes> userNotes;
         List<Notes> displayNotes = new ArrayList<>();
-        if (userRepository.findById(user_id).isPresent()) {
+
+        String userName = tokenCheck();
+
+        if (userRepository.findByUserName(userName).get().getUserName().equals(userName)) {
             userNotes = userRepository.findById(user_id).get().getNotes();
             for (Notes note : userNotes) {
                 if (note.isArchived() == false && note.isPinned() == false && note.isDeleted() == false) {
@@ -123,7 +126,9 @@ public class INotesServiceImpl implements INotesService {
     }
 
     public Response deleteNote(int user_id, int note_id) throws CustomException {
-        if (userRepository.findById(user_id).isPresent()) {
+        String userName = tokenCheck();
+
+        if (userRepository.findById(user_id).get().getUserName().equals(userName)) {
             if (notesRepository.findById(note_id).isPresent()) {
                 notesRepository.deleteById(note_id);
             } else {
@@ -136,7 +141,9 @@ public class INotesServiceImpl implements INotesService {
     }
 
     public Response restoreNote(int user_id, int note_id) {
-        if (userRepository.findById(user_id).isPresent()) {
+        String userName = tokenCheck();
+
+        if (userRepository.findById(user_id).get().getUserName().equals(userName)) {
             if (notesRepository.findById(note_id).get().isDeleted() == true) {
                 List<Notes> userNotes = userRepository.findById(user_id).get().getNotes();
                 for (Notes note : userNotes) {
@@ -155,80 +162,79 @@ public class INotesServiceImpl implements INotesService {
     }
 
     public Response archivedNote(String username, int note_id) {
-        // String userName = tokenCheck();
+        String userName = tokenCheck();
 
-        // if
-        // (userRepository.findByUserName(userName).get().getUserName().equals(userName))
-        // {
-        if (notesRepository.findById(note_id).get().isArchived() == false) {
-            notesRepository.findById(note_id).get().setArchived(true);
-            notesRepository.save(notesRepository.findById(note_id).get());
+        if (userRepository.findByUserName(userName).get().getUserName().equals(userName)) {
+            if (notesRepository.findById(note_id).get().isArchived() == false) {
+                notesRepository.findById(note_id).get().setArchived(true);
+                notesRepository.save(notesRepository.findById(note_id).get());
+            } else {
+                notesRepository.findById(note_id).get().setArchived(false);
+                notesRepository.save(notesRepository.findById(note_id).get());
+            }
         } else {
-            notesRepository.findById(note_id).get().setArchived(false);
-            notesRepository.save(notesRepository.findById(note_id).get());
+            throw new CustomException("Username Not Found");
         }
 
         return new Response("Archive Request Successfull", HttpStatus.OK);
-        // } else {
-        // throw new CustomException("Username Not Found");
-        // }
 
     }
 
     public Response updateNote(String username, int note_id, NotesDto notesDto) {
-        // String userName = tokenCheck();
-        // if (username.equals(userName)) {
-        Notes notes = notesRepository.getById(note_id);
-        if (notes != null) {
-            notes.setTitle(notesDto.getTitle());
-            notes.setDescription(notesDto.getDescription());
-            notes.setColor(notesDto.getColor());
-            notesRepository.save(notes);
-        } else {
-            throw new CustomException("Note Not found");
-        }
-        // } else
-        // throw new CustomException("You are Not Authorized");
+        String userName = tokenCheck();
+        if (username.equals(userName)) {
+            Notes notes = notesRepository.getById(note_id);
+            if (notes != null) {
+                notes.setTitle(notesDto.getTitle());
+                notes.setDescription(notesDto.getDescription());
+                notes.setColor(notesDto.getColor());
+                notesRepository.save(notes);
+            } else {
+                throw new CustomException("Note Not found");
+            }
+        } else
+            throw new CustomException("You are Not Authorized");
 
         return new Response("Note Updated Successfully", HttpStatus.OK);
     }
 
     public Response getArchievedNotes(int user_id) {
 
-        // String userName = tokenCheck();
-
-        // if (userName.equals(userRepository.findById(user_id).get().getUserName())) {
-        // System.out.println("===working");
-        // System.out.println("qdwwd" + notesRepository.findUnArchived());
-
+        String userName = tokenCheck();
         List<Notes> archievedNotes = new ArrayList<>();
 
-        List<Notes> userNotes = userRepository.findById(user_id).get().getNotes();
+        if (userName.equals(userRepository.findById(user_id).get().getUserName())) {
 
-        for (Notes note : userNotes) {
-            if (note.isArchived() == true) {
-                archievedNotes.add(note);
+            List<Notes> userNotes = userRepository.findById(user_id).get().getNotes();
+
+            for (Notes note : userNotes) {
+                if (note.isArchived() == true) {
+                    archievedNotes.add(note);
+                }
             }
         }
-
-        return new Response("", archievedNotes);
         // } else
         // throw new CustomException("YOU ARE NOT AUTHORIZED");
+
+        return new Response("", archievedNotes);
+
     }
 
     public Response getTrashNotes(int user_id) {
-        // String userName = tokenCheck();
+        String userName = tokenCheck();
 
-        // if (userName.equals(userRepository.findById(user_id).get().getUserName())) {
-        // System.out.println("===working123");
-        // System.out.println("123456" + notesRepository.findUnArchived());
         List<Notes> deleteNotes = new ArrayList<>();
 
-        List<Notes> userNotes = userRepository.findById(user_id).get().getNotes();
+        if (userName.equals(userRepository.findById(user_id).get().getUserName())) {
+            // System.out.println("===working123");
+            // System.out.println("123456" + notesRepository.findUnArchived());
 
-        for (Notes note : userNotes) {
-            if (note.isDeleted() == true) {
-                deleteNotes.add(note);
+            List<Notes> userNotes = userRepository.findById(user_id).get().getNotes();
+
+            for (Notes note : userNotes) {
+                if (note.isDeleted() == true) {
+                    deleteNotes.add(note);
+                }
             }
         }
 
@@ -238,25 +244,33 @@ public class INotesServiceImpl implements INotesService {
     }
 
     public Response pinNote(int id) {
-        if (notesRepository.findById(id).get().isPinned() == false) {
-            notesRepository.findById(id).get().setPinned(true);
-            notesRepository.save(notesRepository.findById(id).get());
-        } else {
-            notesRepository.findById(id).get().setPinned(false);
-            notesRepository.save(notesRepository.findById(id).get());
+        String userName = tokenCheck();
+
+        if (userRepository.findByUserName(userName).isPresent()) {
+            if (notesRepository.findById(id).get().isPinned() == false) {
+                notesRepository.findById(id).get().setPinned(true);
+                notesRepository.save(notesRepository.findById(id).get());
+            } else {
+                notesRepository.findById(id).get().setPinned(false);
+                notesRepository.save(notesRepository.findById(id).get());
+            }
         }
         return new Response("Pinned Successfully", HttpStatus.OK);
     }
 
     public Response getPinned(int user_id) {
 
+        String userName = tokenCheck();
+
         List<Notes> pinnedNotes = new ArrayList<>();
 
-        List<Notes> userNotes = userRepository.findById(user_id).get().getNotes();
+        if (userRepository.findByUserName(userName).isPresent()) {
+            List<Notes> userNotes = userRepository.findById(user_id).get().getNotes();
 
-        for (Notes note : userNotes) {
-            if (note.isPinned() == true) {
-                pinnedNotes.add(note);
+            for (Notes note : userNotes) {
+                if (note.isPinned() == true) {
+                    pinnedNotes.add(note);
+                }
             }
         }
 

@@ -7,6 +7,9 @@ import com.bridgelabz.notesapp.user.dto.UserRegisterDto;
 import com.bridgelabz.notesapp.exception.CustomException;
 import com.bridgelabz.notesapp.user.service.UserServiceImpl;
 import com.bridgelabz.notesapp.utility.Response;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,9 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     private UserServiceImpl userServiceImpl;
+
+    @Autowired
+    private HttpServletRequest request;
 
     @PostMapping("/register")
     public ResponseEntity<Response> registerUser(@RequestBody UserRegisterDto userRegisterDto) {
@@ -39,7 +45,7 @@ public class UserController {
         return new ResponseEntity<>(userServiceImpl.login(userloginDto), HttpStatus.OK);
     }
 
-    @PutMapping("/reset-password/{user_id}")
+    @PostMapping("/reset-password/{user_id}")
     public ResponseEntity<Response> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto,
             @PathVariable int user_id) throws CustomException {
         return new ResponseEntity<>(userServiceImpl.resetPassword(user_id, resetPasswordDto), HttpStatus.OK);

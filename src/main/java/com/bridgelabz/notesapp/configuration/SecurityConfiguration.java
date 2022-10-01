@@ -33,14 +33,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.cors();
+
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/user/register", "/user/login", "/user/confirm-email/**", "/user/forgot-password/{email}",
-                        "/user/{user_id}/getnotes", "/user/{username}", "/user/{user_id}/delete/{note_id}",
-                        "/user/{user_id}/getarchieved", "/user/{user_id}/getdeleted",
-                        "/user/archieve/{username}/{note_id}", "/user/addnote/{id}",
-                        "/user/{user_id}/restore/{note_id}", "/user/{user_id}/remove/{note_id}",
-                        "/user/{username}/update/{note_id}", "/user/pin/{id}", "/user/{user_id}/getpinned",
+                .antMatchers("/user/register", "/user/login", "/user/confirm-email/**",
+                        "/user/forgot-password/{email}",
+                        "/user/{username}",
                         "/user/send-otp/{email}")
                 .permitAll()
                 .anyRequest()
