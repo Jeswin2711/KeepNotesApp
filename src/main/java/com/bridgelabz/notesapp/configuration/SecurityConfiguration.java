@@ -40,7 +40,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/register", "/user/login", "/user/confirm-email/**",
                         "/user/forgot-password/{email}",
                         "/user/{username}",
-                        "/user/send-otp/{email}")
+                        "/user/send-otp/{email}",
+                        "/user/{note_id}/setbackground/{color}")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

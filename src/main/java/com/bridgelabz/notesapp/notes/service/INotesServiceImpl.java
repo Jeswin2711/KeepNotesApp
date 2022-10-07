@@ -187,7 +187,6 @@ public class INotesServiceImpl implements INotesService {
             if (notes != null) {
                 notes.setTitle(notesDto.getTitle());
                 notes.setDescription(notesDto.getDescription());
-                notes.setColor(notesDto.getColor());
                 notesRepository.save(notes);
             } else {
                 throw new CustomException("Note Not found");
@@ -275,5 +274,15 @@ public class INotesServiceImpl implements INotesService {
         }
 
         return new Response("OK", pinnedNotes);
+    }
+
+    public Response setColor(int note_id, String color) {
+        if (notesRepository.findById(note_id).isPresent()) {
+            notesRepository.findById(note_id).get().setColor(color);
+            notesRepository.save(notesRepository.findById(note_id).get());
+            return new Response("Color Updated Success", notesRepository.findById(note_id).get());
+        } else {
+            throw new CustomException("Note ID not found");
+        }
     }
 }

@@ -89,4 +89,9 @@ public class NotesController {
         return new ResponseEntity<>(notesService.getPinned(user_id), HttpStatus.OK);
     }
 
+    @PostMapping("/{note_id}/setbackground/{color}")
+    public ResponseEntity<Response> setColor(@PathVariable int note_id, @PathVariable String color) {
+        return new ResponseEntity<>(notesService.setColor(note_id, color), HttpStatus.OK);
+    }
+
 }
