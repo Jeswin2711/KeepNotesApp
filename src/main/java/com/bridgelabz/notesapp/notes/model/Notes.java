@@ -30,6 +30,6 @@ public class Notes {
     @Column(name = "isPinned")
     private boolean isPinned = Boolean.FALSE;
 
-    @Column(name = "Color")
-    private String color = "white";
+    @Column(columnDefinition = "varchar(255) default 'white'")
+    private String color;
 }

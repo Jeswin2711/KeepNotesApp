@@ -62,7 +62,7 @@ public class INotesServiceImpl implements INotesService {
                     flag = true;
                 }
             }
-            if (!false) {
+            if (flag) {
                 System.out.println("Note ID Present");
             } else {
                 throw new CustomException("NOTE ID Not Found");
@@ -168,6 +168,10 @@ public class INotesServiceImpl implements INotesService {
             if (notesRepository.findById(note_id).get().isArchived() == false) {
                 notesRepository.findById(note_id).get().setArchived(true);
                 notesRepository.save(notesRepository.findById(note_id).get());
+            } else if (notesRepository.findById(note_id).get().isPinned() == true) {
+                notesRepository.findById(note_id).get().setPinned(false);
+                notesRepository.findById(note_id).get().setArchived(true);
+                notesRepository.save(notesRepository.findById(note_id).get());
             } else {
                 notesRepository.findById(note_id).get().setArchived(false);
                 notesRepository.save(notesRepository.findById(note_id).get());
@@ -211,9 +215,9 @@ public class INotesServiceImpl implements INotesService {
                     archievedNotes.add(note);
                 }
             }
+        } else {
+            throw new CustomException("You are not Authorized");
         }
-        // } else
-        // throw new CustomException("YOU ARE NOT AUTHORIZED");
 
         return new Response("", archievedNotes);
 
@@ -225,8 +229,6 @@ public class INotesServiceImpl implements INotesService {
         List<Notes> deleteNotes = new ArrayList<>();
 
         if (userName.equals(userRepository.findById(user_id).get().getUserName())) {
-            // System.out.println("===working123");
-            // System.out.println("123456" + notesRepository.findUnArchived());
 
             List<Notes> userNotes = userRepository.findById(user_id).get().getNotes();
 
@@ -235,11 +237,11 @@ public class INotesServiceImpl implements INotesService {
                     deleteNotes.add(note);
                 }
             }
+        } else {
+            throw new CustomException("You are not Authorized");
         }
 
         return new Response("", deleteNotes);
-        // } else
-        // throw new CustomException("YOU ARE NOT AUTHORIZED");
     }
 
     public Response pinNote(int id) {
@@ -253,6 +255,8 @@ public class INotesServiceImpl implements INotesService {
                 notesRepository.findById(id).get().setPinned(false);
                 notesRepository.save(notesRepository.findById(id).get());
             }
+        } else {
+            throw new CustomException("You are not Authorized");
         }
         return new Response("Pinned Successfully", HttpStatus.OK);
     }
@@ -271,6 +275,8 @@ public class INotesServiceImpl implements INotesService {
                     pinnedNotes.add(note);
                 }
             }
+        } else {
+            throw new CustomException("You are not Authorized");
         }
 
         return new Response("OK", pinnedNotes);
